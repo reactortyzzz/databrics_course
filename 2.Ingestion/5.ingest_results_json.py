@@ -14,11 +14,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
-# MAGIC %run "../3.includes/1.configuration"
+# MAGIC %run "/Workspace/Repos/karpeko1995@gmail.com/databrics_course/3.includes/1.configuration"
 
 # COMMAND ----------
 
-# MAGIC %run "../3.includes/2.common_functions"
+# MAGIC %run "/Workspace/Repos/karpeko1995@gmail.com/databrics_course/3.includes/2.common_functions"
 
 # COMMAND ----------
 
