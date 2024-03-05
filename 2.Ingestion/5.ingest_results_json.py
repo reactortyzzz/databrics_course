@@ -70,7 +70,7 @@ from pyspark.sql.functions import current_timestamp, lit
 
 results_with_columns_df = results_df.withColumnRenamed('resultId', 'result_id') \
 .withColumnRenamed('raceId', 'race_id') \
-.withColumnRenamed('driveId', 'driver_id') \
+.withColumnRenamed('driverId', 'driver_id') \
 .withColumnRenamed('constructorId', 'constructor_id') \
 .withColumnRenamed('positionText', 'position_text') \
 .withColumnRenamed('positionOrder', 'position_order') \
@@ -101,6 +101,10 @@ results_final_df = timestamp_df.drop('statusId')
 # COMMAND ----------
 
 results_final_df.write.mode("overwrite").partitionBy("race_id").parquet(f"{processed_folder_path}/results")
+
+# COMMAND ----------
+
+spark.read.parquet(f"{processed_folder_path}/results").printSchema()
 
 # COMMAND ----------
 

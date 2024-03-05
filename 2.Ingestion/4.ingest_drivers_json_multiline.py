@@ -39,7 +39,8 @@ name_schema = StructType(
 driver_schema = StructType(
     fields = [
                StructField("driverId", IntegerType(), False), #last parameter False is nullable or not
-               StructField("driverRef", StringType(), True),
+               StructField("driverRef", StringType(), True), 
+               StructField("number", IntegerType(), True),
                StructField("code", IntegerType(), True),
                StructField("name", name_schema, True),
                StructField("dob", StringType(), True),
@@ -92,7 +93,7 @@ driver_final_df = timestamp_df.drop('url')
 
 # COMMAND ----------
 
-driver_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/results")
+driver_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/drivers")
 
 # COMMAND ----------
 
