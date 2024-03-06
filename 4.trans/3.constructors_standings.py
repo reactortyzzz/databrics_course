@@ -12,18 +12,18 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-grouped_df = race_results.groupBy("race_year", "driver_name", "driver_nationality", "team") \
+grouped_df = race_results.groupBy("race_year", "team") \
     .agg(sum("points").alias("total_points"), 
          count(when(col("position") == 1, True)).alias("wins"))
 
 # COMMAND ----------
 
-driver_rank_spec = Window.partitionBy("race_year").orderBy(desc("total_points"),desc("wins"))
+constructor_rank_spec = Window.partitionBy("race_year").orderBy(desc("total_points"),desc("wins"))
 
 # COMMAND ----------
 
-final_df = grouped_df.withColumn("rank", rank().over(driver_rank_spec))
+final_df = grouped_df.withColumn("rank", rank().over(constructor_rank_spec))
 
 # COMMAND ----------
 
-final_df.write.mode("overwrite").parquet(f"{presentation_folder_path}/driver_standings")
+final_df.write.mode("overwrite").parquet(f"{presentation_folder_path}/constructor_standings")
