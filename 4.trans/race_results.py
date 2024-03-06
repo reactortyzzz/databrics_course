@@ -50,7 +50,7 @@ from pyspark.sql.functions import current_timestamp
 final_df = joined_df.select(race_circuits_df.race_year, race_circuits_df.race_name ,  race_circuits_df.race_date , race_circuits_df.circuit_location \
         , drivers_df.driver_name, drivers_df.driver_number, drivers_df.driver_nationality \
         , constructors_df.team \
-        , results_df.grid, results_df.fastest_lap, results_df.race_time, results_df.points ) \
+        , results_df.grid, results_df.fastest_lap, results_df.race_time, results_df.points.cast("float"),results_df.position ) \
         .withColumn('created_date', current_timestamp())
 
 # COMMAND ----------
