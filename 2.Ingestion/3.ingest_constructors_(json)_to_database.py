@@ -60,7 +60,7 @@ timestamp_df = add_ingestion_date(constuctors_final_df)
 
 # COMMAND ----------
 
-timestamp_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.constuctors")
+timestamp_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.constructors")
 
 # COMMAND ----------
 
