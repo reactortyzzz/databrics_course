@@ -107,23 +107,34 @@ results_final_df = timestamp_df.drop('statusId')
 
 # COMMAND ----------
 
-# MAGIC %md 
-# MAGIC ####Incremental load - Method 1
+# MAGIC %md
+# MAGIC #second method
+# MAGIC spark expects partition column to be the last one
+# MAGIC also this method should have better perfomance as we do not manualy check for partition to drop and replace but letting spark to do so
 
 # COMMAND ----------
 
-#method 1 of incremental load
-#solution made in a way so that when we re-run a notebook we won't have duplicates, that's why we check if there are existing partitions and if there are - we drop them
-#the other one check here is checking the existing of the table and only on existing table we make the changes
-#collect converts data to a list - be careful with large datasets because it put data in worker memory
-for race_id_list in results_final_df.select("race_id").distinct().collect():
-    if (spark._jsparkSession.catalog().tableExists("f1_processed.results")):
-        spark.sql(f"ALTER TABLE f1_processed.results DROP IF EXISTS PARTITION (race_id = {race_id_list.race_id})")
+# MAGIC %sql
+# MAGIC --drop table f1_processed.results
 
 # COMMAND ----------
 
-#here we make append, not overwrite
-results_final_df.write.mode("append").partitionBy("race_id").format("parquet").saveAsTable("f1_processed.results")
+#we need to tell spark that order ingestion is dynamic because defauls is static and it will overwrite all data 
+spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+
+# COMMAND ----------
+
+results_final_df = results_final_df.select("result_id", "driver_id","constructor_id","number","grid","position","position_text","position_order","points","laps","time","milliseconds","fastest_lap","fastest_lap_time","fastest_lap_speed","date_source","file_date","ingestion_date","race_id")
+
+# COMMAND ----------
+
+#for this method partition column should be the last one in the table so we need to change the order in step above
+if (spark._jsparkSession.catalog().tableExists("f1_processed.results")):
+    #this part is used for incremental part
+    results_final_df.write.mode("overwrite").insertInto("f1_processed.results")
+else:
+   #this part is used for cut-over initial data part
+    results_final_df.write.mode("overwrite").partitionBy("race_id").format("parquet").saveAsTable("f1_processed.results") 
 
 # COMMAND ----------
 

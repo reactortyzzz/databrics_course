@@ -15,6 +15,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-04-18")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "/Workspace/Repos/karpeko1995@gmail.com/databrics_course/3.includes/1.configuration"
 
 # COMMAND ----------
@@ -39,7 +44,7 @@ lap_times_schema = StructType(fields=[StructField("raceId", IntegerType(), False
 
 lap_times_df = spark.read \
     .schema(lap_times_schema) \
-    .csv(f"{raw_folder_path}/lap_times/*.csv")
+    .csv(f"{raw_folder_path}/{v_file_date}/lap_times/*.csv")
 
 # COMMAND ----------
 
@@ -53,7 +58,7 @@ from pyspark.sql.functions import current_timestamp, lit
 # COMMAND ----------
 
 final_df = lap_times_df.withColumnRenamed("driverId", "driver_id") \
-.withColumnRenamed("raceId", "race_id").withColumn("date_source", lit(v_data_source))
+.withColumnRenamed("raceId", "race_id").withColumn("date_source", lit(v_data_source)).withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 
@@ -66,7 +71,11 @@ timestamp_df = add_ingestion_date(final_df)
 
 # COMMAND ----------
 
-timestamp_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.lap_times")
+##timestamp_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.lap_times")
+
+# COMMAND ----------
+
+overwrite_partition(timestamp_df, "f1_processed", "lap_times", "race_id")
 
 # COMMAND ----------
 

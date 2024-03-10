@@ -4,6 +4,11 @@ v_data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run "/Workspace/Repos/karpeko1995@gmail.com/databrics_course/3.includes/1.configuration"
 
 # COMMAND ----------
@@ -33,52 +38,20 @@ circuits_schema = StructType(fields = [
 
 # COMMAND ----------
 
+f'{raw_folder_path}/{v_file_date}/circuits.csv'
+
+# COMMAND ----------
+
 # main calling method
-circuits_df = spark.read.option("header", True).schema(circuits_schema).csv(f'{raw_folder_path}/circuits.csv')  
+circuits_df = spark.read.option("header", True) \
+.schema(circuits_schema) \
+.csv(f'{raw_folder_path}/{v_file_date}/circuits.csv')  
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC #### select only specific columns
 # MAGIC
-
-# COMMAND ----------
-
-circuits_selected_df = circuits_df.select ( "circuitId", "circuitRef",
-    "name",
-     "location",
-    "country",
-    "lat",
-    "lng",
-    "alt",
-)
- 
-
-# COMMAND ----------
-
-circuits_selected_df2 = circuits_df.select ( 
-    circuits_df.circuitId, 
-    circuits_df.circuitRef,
-    circuits_df.name,
-    circuits_df.location,
-    circuits_df.country,
-    circuits_df.lat,
-    circuits_df.lng,
-    circuits_df.alt,
-)
-
-# COMMAND ----------
-
-circuits_selected_df3 = circuits_df.select ( 
-    circuits_df["circuitId"], 
-    circuits_df["circuitRef"],
-    circuits_df["name"],
-    circuits_df["location"],
-    circuits_df["country"],
-    circuits_df["lat"],
-    circuits_df["lng"],
-    circuits_df["alt"]
-)
 
 # COMMAND ----------
 
@@ -115,7 +88,9 @@ circuits_renamed_df = circuits_selected_df4.withColumnRenamed("circuitId", "circ
 .withColumnRenamed("circuitRef", "circuit_ref") \
 .withColumnRenamed("lat", "latitude") \
 .withColumnRenamed("lng", "longitude") \
-.withColumnRenamed("alt", "altitude").withColumn("date_source", lit(v_data_source))
+.withColumnRenamed("alt", "altitude") \
+.withColumn("date_source", lit(v_data_source)) \
+.withColumn("file_date", lit(v_file_date))
 
 # COMMAND ----------
 
